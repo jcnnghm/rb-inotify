@@ -180,14 +180,14 @@ module INotify
     #   or the flags don't contain any events
     def watch(path, *flags, &callback)
       return Watcher.new(self, path, *flags, &callback) unless flags.include?(:recursive)
-      Dir.entries(path).each do |d|
-        begin
+      begin
+        Dir.entries(path).each do |d|
 	  next if d == '.' || d == '..'
           d = File.join(path, d)
           watch(d, *flags, &callback) if !RECURSIVE_BLACKLIST.include?(d) && File.directory?(d)
-	rescue
-	  # this prevents an interaction error with guard  
-	end
+        end
+      rescue
+        # For guard
       end
 
       rec_flags = [:create, :moved_to]
